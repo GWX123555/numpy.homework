@@ -14,25 +14,25 @@ To reproduce the results, please follow these steps:
    ```bash
    git clone https://github.com/GWX123555/numpy.homework.git
    cd numpy.homework
-   python "numpy.homework.py"
-    Expected Output
-When you run the script, you will see the outputs for all 12 exercises sequentially. Below is a summary of the expected output:
+ Run the verification script:
+Ensure the provided helpers.py, the model weights, and the check.py script are in the same directory as image_encoder.py, then run:
 
-NP-E1 to NP-E8: Array properties, slicing, copying, element-wise operations, dot products, vector norms, angles, distances, unit vectors, and broadcasting.
+bash
+python check.py
+ Expected Output
+When you run the verification script, all components should pass. The terminal output should look exactly like this:
 
-M1: Calculates the angle between a query vector and an array of vectors.
-
-M2: Retrieves the top-3 most similar images based on cosine similarity, correctly handling zero vectors.
-
-M3: Computes the pairwise Euclidean distance matrix between two sets of points.
-
-M4: Performs a forward pass for a 2-layer neural network with ReLU activation.
-
+text
+assets      PASS
+preprocess  PASS
+patches     PASS
+tokens      PASS
+block0      PASS
+last_tokens PASS
+output      PASS
  Implementation Highlights
-Robustness: Functions like angle_deg, unit_vector, and top_k_cosine include strict type and dimension checking. They raise ValueError when encountering zero vectors to prevent division-by-zero errors.
+Strict Float32 Precision: A major challenge in this project was preventing NumPy from upcasting arrays to float64. I explicitly cast all model weights, intermediate scaling factors (np.sqrt), and final outputs to float32 to pass the precision checks.
 
-Efficient Matrix Operations: Used np.newaxis and broadcasting in pairwise_dist to compute distance matrices without using slow Python loops.
+Correct Patchify Order: In the patchify method, the images are reshaped and transposed using x.transpose(0, 2, 4, 1, 3, 5). This ensures the patches are extracted sequentially from left-to-right and top-to-bottom, which is crucial for preserving spatial features.
 
-Top-K Selection: Implemented top_k_cosine using boolean masking to filter out zero vectors, followed by np.argsort to efficiently find the highest similarity scores.
-
-
+Efficient Attention Mechanism: The MultiHeadAttention class efficiently splits, scales, and merges heads without relying on slow Python loops, utilizing matrix multiplications (@) and broadcasting for the Q, K, and V computations.
